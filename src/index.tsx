@@ -5,11 +5,13 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import './index.css'
 import App from './App';
 import Login from './view/Login';
 import Register from './view/Register';
 import Error404 from './Components/error404';
 // import Error403 from './Components/error403';
+import { AuthProvider } from "./contex";
 
 const router = createBrowserRouter([
   {
@@ -34,7 +36,9 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </React.StrictMode>
 );
 

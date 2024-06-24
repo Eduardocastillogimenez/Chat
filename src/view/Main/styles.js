@@ -4,8 +4,9 @@ export const StyleMenuMiniOption = styled.div`
     position: fixed;
     height: 100vh;
     width: 100vw;
-    background-color: rgba(5, 80, 80, 0.342);
+    background-color: #1677ff33;
     z-index: 10000;
+    overflow-y: hidden;
 `;
 
 export const OptionMenu = styled.p`
