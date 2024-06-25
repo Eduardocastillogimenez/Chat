@@ -24,6 +24,7 @@ const Chat = (props: any) => {
           res.data.forEach((e:any)=>{
             arrayText.push({
                 email: e.user?.email, 
+                nameUser: e.user?.name, 
                 text: descifrarTexto(e.message, props?.user?.email),
                 chat_id: e.chat_id,
                 id: e.id
@@ -98,7 +99,8 @@ return (
                         return (
                             <div style={  msj.email === props.user.email ? {textAlign: 'end'} : {textAlign: 'start'}} key={msj.id}> 
                                <p style={  msj.email === props.user.email ? {backgroundColor: '#1677ff'} : {backgroundColor: '#1677ff33'}}>
-                                    {msj.text}
+                                    {msj.email === props.user.email? '' : <div style={{fontSize:'12px', color:'#001529'}}>{msj.nameUser}</div>}
+                                    <div>{msj.text}</div>
                                 </p> 
                             </div>
                             
