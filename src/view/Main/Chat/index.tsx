@@ -1,21 +1,43 @@
 
-import React, { useState } from 'react';
-import { Row, Col, Input, Button, Card } from 'antd';
+import { useState, useEffect } from 'react';
+import { Row, Col, Input, Button, Card, message } from 'antd';
 import { SearchOutlined, BellOutlined, SendOutlined, FolderOpenOutlined, CarOutlined } from '@ant-design/icons';
 import InputEmoji from 'react-input-emoji';
 
 import { Container, TextChatDiv } from './styles';
+import {cifrarTexto, descifrarTexto}  from '../utils';
+import { fetchChatMessages, sendMessage } from '../../../bd/messages';
 
-const { TextArea } = Input;
+const textosDePrueba = [ 'hola','hola',':)',':)','Como estas','bien','y tu','bien','ok','q bueno','si','aja','bueno chao','ok','chao','chao','chao']
 
-const textosDePrueba = [
-    'hola','hola',':)',':)','Como estas','bien','y tu','bien','ok','q bueno','si','aja','bueno chao','ok','chao','chao','chao'
-]
-
-
-const Chat = () => {
-    const [texts, setTexts] = useState(textosDePrueba);
+const Chat = (props: any) => {
+    const [texts, setTexts] = useState<any>(null);
     const [text, setText] = useState("");
+    const [messageApi, contextHolder] = message.useMessage();
+
+    async function loadMessages() {
+        const res = await fetchChatMessages(props.chatSelect.id, props.user.token);
+        if(res){
+          console.log('load msg', res.data);
+          const arrayText:any = [];
+          
+          res.data.forEach((e:any)=>{
+            arrayText.push({
+                email: e.user?.email, 
+                text: descifrarTexto(e.message, props?.user?.email),
+                chat_id: e.chat_id,
+                id: e.id
+            });
+          })
+          setTexts(arrayText);
+        }else{
+          messageApi.open({ type: 'error', content: 'Msg not found' });
+        }
+    }
+
+    useEffect(() => {
+        loadMessages();
+    }, [props.chatSelect]);
 
     const handleClick = () => {
         alert('¡Haz hecho clic en el botón!');
@@ -43,39 +65,49 @@ const Chat = () => {
                 matches = matches + match[3];
             }
         }
-    
+        
         return matches;
     }
     
   
-    function handleOnEnter (text: any) {
-        console.log('enter', extractContentFromString(text));
-        texts.push(extractContentFromString(text));
+    async function handleOnEnter (text: any) {
+        const msjSend = extractContentFromString(text);
+        const msjSendEncrypted = cifrarTexto(msjSend, props?.user?.email);
+        // const arrayMsg = [...texts];
+        // arrayMsg.push(msjSend);
+        // setTexts(arrayMsg);
+        const res = await sendMessage({ message: msjSendEncrypted, chat_id: props.chatSelect.id }, props.user.token );
+        if(res){
+            console.log('send msg ok');
+            loadMessages();
+        }else{
+            messageApi.open({ type: 'error', content: 'Msg not send' });
+        }
     }
 
 return (
     <Container>
+        {contextHolder}
         <Row gutter={16} style={{ height: '100%' }} align="bottom"> 
             <Col span={24} style={{
                 height: 'calc(100% - 60px)', maxHeight: '600px', overflowY: 'scroll', position: 'sticky', 
                 scrollbarWidth: 'thin', scrollbarColor: '#525252bc rgb(255, 255, 255, 0)'}}
             >
                 <TextChatDiv>
-                    {texts.map((text, i)=>{
+                    {texts ? texts.map((msj:any)=>{
                         return (
-                            <div style={  i % 2 !== 0 ? {textAlign: 'start'}: {textAlign: 'end'}} key={i}> 
-                               <p style={  i % 2 !== 0 ? {backgroundColor: '#1677ff33'}: {backgroundColor: '#1677ff'}}>
-                                    {text}
+                            <div style={  msj.email === props.user.email ? {textAlign: 'end'} : {textAlign: 'start'}} key={msj.id}> 
+                               <p style={  msj.email === props.user.email ? {backgroundColor: '#1677ff'} : {backgroundColor: '#1677ff33'}}>
+                                    {msj.text}
                                 </p> 
                             </div>
                             
                         )
-                    })}
+                    }): ''}
                 </TextChatDiv>
             </Col>
             <Col span={24} style={{ padding: '3px' }}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <Button type="primary" icon={<CarOutlined />} style={{ margin: '5px' }} onClick={handleClick} />
                     <Button type="primary" icon={<FolderOpenOutlined />} style={{ margin: '5px' }} onClick={handleClick} />
                     {/* <TextArea rows={2} placeholder="Buscar..." /> */}
                     <InputEmoji
@@ -88,7 +120,7 @@ return (
                         placeholder="Type a message"
                     />
                     {/* <Input style={{ flex: '1', marginRight: '10px' }}  /> */}
-                    <Button type="primary" icon={<SendOutlined />} style={{ margin: '5px' }}  onClick={handleClick} />
+                    <Button type="primary" icon={<SendOutlined />} style={{ margin: '5px' }}  onClick={()=>handleOnEnter(text)} />
                 </div>
             </Col>
         </Row>

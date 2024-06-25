@@ -8,13 +8,12 @@ const App = () => {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    console.log(user, 'login', loading)
     if(!user){
       navigate("/login");
     }
   }, [user]);
 
-  return (<> {loading ? '' : <Main/>} </>);
+  return (<> {loading ? '' : user? <Main/> : 'loading user'} </>);
 };
 
 export default App;

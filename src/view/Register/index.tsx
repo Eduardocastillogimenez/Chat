@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Form, Input, Button, Card, message } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
-import Logo from '../../logo.svg';
+import Logo from '../../logo.png';
 import registerUser from '../../bd/register';
 import { useAuth } from "../../contex";
 
@@ -24,6 +24,7 @@ const Register = () => {
     const res = await registerUser(values);
     if(res){
       loadingFinish();
+      navigate("/login");
     }else{
       messageApi.open({
         type: 'error',
