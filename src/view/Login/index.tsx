@@ -27,7 +27,8 @@ const Login = () => {
       login({
         name: res?.data.name,
         token: res?.data.token,
-        email: res?.data.email
+        email: res?.data.email,
+        id: res?.data.id,
       })
       loadingFinish();
     }else{
@@ -46,9 +47,6 @@ const Login = () => {
           <img src={Logo} alt="Logo" style={{ height: 90 }} />
         </div>
         <Form name="login-form" onFinish={onFinish}>
-          <Form.Item name="username" rules={[{ required: true, message: 'Please enter your username!' }]}>
-            <Input prefix={<UserOutlined />} placeholder="Username" />
-          </Form.Item>
           <Form.Item name="email" rules={[{ required: true, message: 'Please enter your email!', type: 'email' }]}>
             <Input prefix={<MailOutlined />} placeholder="Email" />
           </Form.Item>

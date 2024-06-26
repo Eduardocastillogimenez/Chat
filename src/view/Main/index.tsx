@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons';
 import type { MenuProps, InputRef, RadioChangeEvent } from 'antd';
 import {  Layout, Menu, Avatar, Modal, message, Button, Input, Select, Typography, Radio, theme } from 'antd';
+import { connectToChannel, disconnectFromChannel } from '../../utils/pusher-client';
 
 import { useAuth } from "../../contex";
 import { fetchData, createChat, fetchContacts } from '../../bd/chats';
@@ -70,6 +71,20 @@ const Main = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [emailsNewChat, setEmailsNewChat] = useState(['']);
   const { user } = useAuth();
+  const [channelName, setChannelName] = useState('')
+  const [pusherConnection, setPusherConnection] = useState<any>(null)
+
+  const handleConnectNewChat = async () => {
+    const _channelName = 'user.' + user.id;
+    setChannelName(_channelName)
+    const channel = connectToChannel(_channelName)
+    setPusherConnection(channel)
+    channel.bind('new-chat', (data:any) => {
+      const chat = data.chat;
+      alert('Se ha creado un nuevo chat: ' + chat.name);
+      setChats([...(chats ? chats : []), itemsOb(chat)]);
+    });
+  }
 
   async function loadChats() {
     const res = await fetchData(user?.token);
@@ -111,6 +126,13 @@ const Main = () => {
     loadContacts();
     loadUserConfig();
   }, []);
+
+  useEffect(() => {
+    handleConnectNewChat();
+    return () => {
+      disconnectFromChannel(pusherConnection, channelName)
+    };
+  }, [user]);
 
   function selectMenu(option: any){
       setChatSelect({

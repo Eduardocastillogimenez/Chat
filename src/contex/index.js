@@ -24,7 +24,8 @@ export function AuthProvider({ children }) {
         setUser({
           name: data.name,
           token: data.token,
-          email: data.email
+          email: data.email,
+          id: data.id
         });
     };
   
