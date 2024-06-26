@@ -198,7 +198,7 @@ const Main = () => {
         title={<p>Add new chat private {'('}Email{')'}</p>}
         open={open2}
         onCancel={() => {setOpen2(false); setEmailsNewChat([''])}}
-        footer={<Button type="primary" style={{ marginTop:'12px' }} onClick={()=> addChat()}>Send</Button>}
+        footer={<Button type="primary" style={{ marginTop:'12px' }} onClick={()=> {addChat(false); setOpen2(false);}}>Send</Button>}
       >
         <Input placeholder="Email" onChange={(e)=> setEmailsNewChat([e.target.value])}/>
       </Modal>
