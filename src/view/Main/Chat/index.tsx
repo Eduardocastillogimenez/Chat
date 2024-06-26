@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Row, Col, Input, Button, Card, message, Modal, Divider, List } from 'antd';
-import { SearchOutlined, BellOutlined, SendOutlined, FolderOpenOutlined, CarOutlined } from '@ant-design/icons';
+import { SearchOutlined, BellOutlined, SendOutlined, FolderOpenOutlined, CarOutlined, FileOutlined } from '@ant-design/icons';
 import InputEmoji from 'react-input-emoji';
 
 import { Container, TextChatDiv, ContainerTableSearh } from './styles';
@@ -31,7 +31,8 @@ const Chat = (props: any) => {
                 text: descifrarTexto(e.message, props?.user?.email),
                 chat_id: e.chat_id,
                 id: e.id,
-                type: e.type
+                type: e.type,
+                file: e.file
             });
           })
           setTexts(arrayText);
@@ -53,7 +54,8 @@ const Chat = (props: any) => {
                 text: descifrarTexto(e.message, props?.user?.email),
                 chat_id: e.chat_id,
                 id: e.id,
-                type: e.type
+                type: e.type,
+                file: e.file
             });
           })
           setTextsSearch(arrayText);
@@ -66,8 +68,21 @@ const Chat = (props: any) => {
         loadMessages();
     }, [props.chatSelect]);
 
-    const fileInsert = (e:any) => {
-        console.log('¡Haz hecho clic en el botón!', e);
+    const fileInsert = async (e:any) => {
+        console.log(e.target.files[0], '¡Haz hecho clic en el botón!', e);
+        const res = await sendMessage({ message: 'file', chat_id: props.chatSelect.id, file: e.target.files[0] }, props.user.token );
+        if(res){
+            console.log('send msg file ok');
+            loadMessages();
+            setText('');
+            e.target.blur();
+            e.target.files = null;
+        }else{
+            messageApi.open({ type: 'error', content: 'Msg file not send' });
+            e.target.blur();
+            e.target.files = null;
+        }
+        // setChats([...(chats ? chats : []), itemsOb(chat)]);
     };
 
     function extractContentFromString(htmlString: string) {
@@ -167,6 +182,14 @@ return (
                                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; o &#160;&nbsp; o &#160;&nbsp; o &#160;
                                         has left the chat&nbsp; o &#160;&nbsp; o &#160;&nbsp; o &#160;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;             
                                 </p> 
+                            :
+                            msj.file ? 
+                            <div style={  msj.email === props.user.email ? {textAlign: 'end'} : {textAlign: 'start'}} key={msj.id}> 
+                               <p style={  msj.email === props.user.email ? {backgroundColor: '#1677ff'} : {backgroundColor: '#1677ff33'}}>
+                                    {msj.email === props.user.email? '' : <div style={{fontSize:'12px', color:'#001529'}}>{msj.nameUser}</div>}
+                                    <div>file <FileOutlined /> {msj.nameUser} </div>
+                                </p> 
+                            </div>
                             :<div style={  msj.email === props.user.email ? {textAlign: 'end'} : {textAlign: 'start'}} key={msj.id}> 
                                <p style={  msj.email === props.user.email ? {backgroundColor: '#1677ff'} : {backgroundColor: '#1677ff33'}}>
                                     {msj.email === props.user.email? '' : <div style={{fontSize:'12px', color:'#001529'}}>{msj.nameUser}</div>}
@@ -181,7 +204,9 @@ return (
             <Col span={24} style={{ padding: '3px' }}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <Button type="primary" icon={<SearchOutlined />} style={{ margin: '5px' }}  onClick={()=>setOpen(true)} />
-                    <Input type="file" onChange={fileInsert}><Button type="primary" icon={<FolderOpenOutlined />} style={{ margin: '5px' }} /></Input>
+                    <Input type="file" onChange={(e)=>fileInsert(e)} style={{ margin: '5px', maxWidth:'120px', background:'#1677ff', color: 'white', padding: '3px', paddingBottom: '5px'}} />
+                    {/* <Button type="primary" icon={<FolderOpenOutlined />}  /> */}
+
                     {/* <TextArea rows={2} placeholder="Buscar..." /> */}
                     <InputEmoji
                         value={text}

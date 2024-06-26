@@ -31,7 +31,13 @@ export const sendMessage = async (resData, authorization) => {
   const data = {
     message: resData.message,
     chat_id: resData.chat_id,
+    file: resData.file
   };
+
+  const formData = new FormData();
+  formData.append("file", resData.file);
+  formData.append("chat_id", resData.chat_id);
+  formData.append("message", resData.message);
 
   try {
     const response = await fetch(url, {
@@ -39,9 +45,9 @@ export const sendMessage = async (resData, authorization) => {
       headers: {
         'Accept': 'application/json',
         'Authorization': 'Bearer ' + authorization, // Reemplaza con el token de autorización adecuado
-        'Content-Type': 'application/json',
+        // 'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      body: resData.file ? formData : JSON.stringify(data),
     });
 
     if (response.ok) {
