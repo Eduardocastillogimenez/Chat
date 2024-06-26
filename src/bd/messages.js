@@ -28,16 +28,16 @@ export const fetchChatMessages = async (idMessages, search, authorization) => {
 
 export const sendMessage = async (resData, authorization) => {
   const url = 'http://instant-messaging-laravel-chat.test/api/chat/message'; // Reemplaza '{{url}}' con la URL correcta
-  const data = {
-    message: resData.message,
-    chat_id: resData.chat_id,
-    file: resData.file
-  };
+
 
   const formData = new FormData();
-  formData.append("file", resData.file);
   formData.append("chat_id", resData.chat_id);
-  formData.append("message", resData.message);
+  if(resData.message) {
+    formData.append("message", resData.message);
+  }
+  if(resData.file) {
+    formData.append("file", resData.file);
+  }
 
   try {
     const response = await fetch(url, {
@@ -45,9 +45,9 @@ export const sendMessage = async (resData, authorization) => {
       headers: {
         'Accept': 'application/json',
         'Authorization': 'Bearer ' + authorization, // Reemplaza con el token de autorización adecuado
-        'Content-Type': 'application/json',
+        // 'Content-Type': 'multipart/form-data',
       },
-      body: resData.file ? formData : JSON.stringify(data),
+      body: formData,
     });
 
     if (response.ok) {

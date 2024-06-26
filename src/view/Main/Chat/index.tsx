@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Row, Col, Input, Button, message, Modal, Divider, List } from 'antd';
 import { SearchOutlined, FolderOpenOutlined, SendOutlined, FileOutlined } from '@ant-design/icons';
 import InputEmoji from 'react-input-emoji';
@@ -17,6 +17,7 @@ const Chat = ({ chatSelect, user }: any) => {
     const [messageApi, contextHolder] = message.useMessage();
     const [channelName, setChannelName] = useState('');
     const [pusherConnection, setPusherConnection] = useState<any>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         loadMessages();
@@ -84,6 +85,7 @@ const Chat = ({ chatSelect, user }: any) => {
     const handleOnEnter = async (text: any) => {
         const msjSend = extractContentFromString(text);
         const msjSendEncrypted = cifrarTexto(msjSend, user?.email);
+        console.log(fileInputRef)
         const res = await sendMessage({ message: msjSendEncrypted, chat_id: chatSelect.id }, user.token);
         if (res) {
             loadMessages();
@@ -116,19 +118,22 @@ const Chat = ({ chatSelect, user }: any) => {
         return matches;
     };
 
-    const fileInsert = async (e:any) => {
-        console.log(e.target.files[0], '¡Haz hecho clic en el botón!', e);
-        const res = await sendMessage({ message: 'file', chat_id: chatSelect.id, file: e.target.files[0] }, user.token );
-        if(res){
-            console.log('send msg file ok');
-            loadMessages();
-            setText('');
-            e.target.blur();
-            e.target.files = null;
-        }else{
-            messageApi.open({ type: 'error', content: 'Msg file not send' });
-            e.target.blur();
-            e.target.files = null;
+    const fileInsert = async (e: any) => {
+        const file = e.target.files[0];
+        if (file) {
+            const res = await sendMessage({ chat_id: chatSelect.id, file }, user.token);
+            if (res) {
+                loadMessages();
+                setText('');
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = ""; // Reset the input value
+                }
+            } else {
+                messageApi.open({ type: 'error', content: 'Msg file not send' });
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = ""; // Reset the input value
+                }
+            }
         }
     };
 
@@ -199,7 +204,7 @@ const Chat = ({ chatSelect, user }: any) => {
                 <Col span={24} style={{ padding: '3px' }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <Button type="primary" icon={<SearchOutlined />} style={{ margin: '5px' }} onClick={() => setOpen(true)} />
-                        <Button type="primary" icon={<FolderOpenOutlined />} style={{ margin: '5px' }} onClick={() => alert('¡Haz hecho clic en el botón!')} />
+                        <Button type="primary" icon={<FolderOpenOutlined />} style={{ margin: '5px' }} onClick={() => fileInputRef.current && fileInputRef.current.click()} />
                         <InputEmoji
                             value={text}
                             onChange={setText}
@@ -210,6 +215,7 @@ const Chat = ({ chatSelect, user }: any) => {
                             placeholder="Type a message"
                         />
                         <Button type="primary" icon={<SendOutlined />} style={{ margin: '5px' }} onClick={() => handleOnEnter(text)} />
+                        <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={fileInsert} />
                     </div>
                 </Col>
             </Row>
