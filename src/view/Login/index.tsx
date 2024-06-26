@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../contex";
 import loginUser from '../../bd/login';
-import Logo from '../../logo.svg';
+import Logo from '../../logo.png';
 
 const Login = () => {
   const { user, login, loadingData, loadingFinish } = useAuth();
@@ -23,9 +23,11 @@ const Login = () => {
     console.log('Received values:', values);
     const res = await loginUser(values);
     if(res){
+      console.log(res, 'resresresres')
       login({
         name: res?.data.name,
-        token: res?.data.token
+        token: res?.data.token,
+        email: res?.data.email
       })
       loadingFinish();
     }else{

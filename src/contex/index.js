@@ -20,10 +20,11 @@ export function AuthProvider({ children }) {
       setLoading(false);
     };
   
-    const login = (name, token) => {
+    const login = (data) => {
         setUser({
-          name: name,
-          token: token
+          name: data.name,
+          token: data.token,
+          email: data.email
         });
     };
   
