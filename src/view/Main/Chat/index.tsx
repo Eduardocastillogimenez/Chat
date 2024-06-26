@@ -30,7 +30,8 @@ const Chat = (props: any) => {
                 nameUser: e.user?.name, 
                 text: descifrarTexto(e.message, props?.user?.email),
                 chat_id: e.chat_id,
-                id: e.id
+                id: e.id,
+                type: e.type
             });
           })
           setTexts(arrayText);
@@ -51,7 +52,8 @@ const Chat = (props: any) => {
                 nameUser: e.user?.name, 
                 text: descifrarTexto(e.message, props?.user?.email),
                 chat_id: e.chat_id,
-                id: e.id
+                id: e.id,
+                type: e.type
             });
           })
           setTextsSearch(arrayText);
@@ -105,6 +107,7 @@ const Chat = (props: any) => {
         if(res){
             console.log('send msg ok');
             loadMessages();
+            setText('');
         }else{
             messageApi.open({ type: 'error', content: 'Msg not send' });
         }
@@ -134,12 +137,16 @@ return (
                 renderItem={(item:any) => 
                 <List.Item>
                     <TextChatDiv>
-                    <div key={item.id}> 
-                               <p style={  item.email === props.user.email ? {backgroundColor: '#1677ff'} : {backgroundColor: '#1677ff33'}}>
+                        {
+                            item.type === 'removed_chat' ?'':
+                            <div key={item.id}> 
+                                <p style={  item.email === props.user.email ? {backgroundColor: '#1677ff'} : {backgroundColor: '#1677ff33'}}>
                                     {item.email === props.user.email? '' : <div style={{fontSize:'12px', color:'#001529'}}>{item.nameUser}</div>}
                                     <div>{item.text}</div>
                                 </p> 
                             </div>
+                        }
+                        
                     </TextChatDiv>
                 </List.Item>}
                 />
@@ -154,7 +161,13 @@ return (
                 <TextChatDiv>
                     {texts ? texts.map((msj:any)=>{
                         return (
-                            <div style={  msj.email === props.user.email ? {textAlign: 'end'} : {textAlign: 'start'}} key={msj.id}> 
+                            msj.type === 'removed_chat' ? 
+                               <p style={{backgroundColor: 'rgba(0, 0, 0, 0.405)', borderRadius: '4px'} }key={msj.id}>
+                                    {msj.email === props.user.email? '' : <span style={{fontSize:'12px', color:'#1677ffaf'}}>&nbsp;{msj.nameUser}</span>}
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; o &#160;&nbsp; o &#160;&nbsp; o &#160;
+                                        has left the chat&nbsp; o &#160;&nbsp; o &#160;&nbsp; o &#160;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;             
+                                </p> 
+                            :<div style={  msj.email === props.user.email ? {textAlign: 'end'} : {textAlign: 'start'}} key={msj.id}> 
                                <p style={  msj.email === props.user.email ? {backgroundColor: '#1677ff'} : {backgroundColor: '#1677ff33'}}>
                                     {msj.email === props.user.email? '' : <div style={{fontSize:'12px', color:'#001529'}}>{msj.nameUser}</div>}
                                     <div>{msj.text}</div>
