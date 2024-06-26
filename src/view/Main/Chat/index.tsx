@@ -1,10 +1,10 @@
 
 import { useState, useEffect } from 'react';
-import { Row, Col, Input, Button, Card, message } from 'antd';
+import { Row, Col, Input, Button, Card, message, Modal, Divider, List } from 'antd';
 import { SearchOutlined, BellOutlined, SendOutlined, FolderOpenOutlined, CarOutlined } from '@ant-design/icons';
 import InputEmoji from 'react-input-emoji';
 
-import { Container, TextChatDiv } from './styles';
+import { Container, TextChatDiv, ContainerTableSearh } from './styles';
 import {cifrarTexto, descifrarTexto}  from '../utils';
 import { fetchChatMessages, sendMessage } from '../../../bd/messages';
 
@@ -12,11 +12,14 @@ const textosDePrueba = [ 'hola','hola',':)',':)','Como estas','bien','y tu','bie
 
 const Chat = (props: any) => {
     const [texts, setTexts] = useState<any>(null);
+    const [textsSearch, setTextsSearch] = useState<any>(null);
     const [text, setText] = useState("");
+    const [open, setOpen] = useState<boolean>(false);
+    const [searhMessage, setSearhMessage] = useState("");
     const [messageApi, contextHolder] = message.useMessage();
-
+    
     async function loadMessages() {
-        const res = await fetchChatMessages(props.chatSelect.id, props.user.token);
+        const res = await fetchChatMessages(props.chatSelect.id, null, props.user.token);
         if(res){
           console.log('load msg', res.data);
           const arrayText:any = [];
@@ -27,10 +30,33 @@ const Chat = (props: any) => {
                 nameUser: e.user?.name, 
                 text: descifrarTexto(e.message, props?.user?.email),
                 chat_id: e.chat_id,
-                id: e.id
+                id: e.id,
+                type: e.type
             });
           })
           setTexts(arrayText);
+        }else{
+          messageApi.open({ type: 'error', content: 'Msg not found' });
+        }
+    }
+
+    async function loadSpecificMessages() {
+        const res = await fetchChatMessages(props.chatSelect.id, searhMessage, props.user.token);
+        if(res){
+          console.log('load msg Specific', res.data);
+          const arrayText:any = [];
+          
+          res.data.forEach((e:any)=>{
+            arrayText.push({
+                email: e.user?.email, 
+                nameUser: e.user?.name, 
+                text: descifrarTexto(e.message, props?.user?.email),
+                chat_id: e.chat_id,
+                id: e.id,
+                type: e.type
+            });
+          })
+          setTextsSearch(arrayText);
         }else{
           messageApi.open({ type: 'error', content: 'Msg not found' });
         }
@@ -81,14 +107,52 @@ const Chat = (props: any) => {
         if(res){
             console.log('send msg ok');
             loadMessages();
+            setText('');
         }else{
             messageApi.open({ type: 'error', content: 'Msg not send' });
         }
     }
 
+    function searhMsg(){
+        loadSpecificMessages();
+    }
+
 return (
     <Container>
         {contextHolder}
+        <Modal
+            title={<p>Type the message you wish to search for</p>}
+            open={open}
+            onCancel={() => {setOpen(false); setTextsSearch(null); setTextsSearch(null); setSearhMessage('')}}
+            footer={<Button type="primary" style={{ marginTop:'12px' }} onClick={()=> searhMsg()}>Searh</Button>}
+        >
+            <Input placeholder="Searh Message" onChange={(e)=> setSearhMessage(e.target.value)} value={searhMessage}/>
+            {textsSearch ? <ContainerTableSearh>
+                <Divider orientation="left"></Divider>
+                <List
+                size="small"
+                header={<div>message</div>}
+                bordered
+                dataSource={textsSearch}
+                renderItem={(item:any) => 
+                <List.Item>
+                    <TextChatDiv>
+                        {
+                            item.type === 'removed_chat' ?'':
+                            <div key={item.id}> 
+                                <p style={  item.email === props.user.email ? {backgroundColor: '#1677ff'} : {backgroundColor: '#1677ff33'}}>
+                                    {item.email === props.user.email? '' : <div style={{fontSize:'12px', color:'#001529'}}>{item.nameUser}</div>}
+                                    <div>{item.text}</div>
+                                </p> 
+                            </div>
+                        }
+                        
+                    </TextChatDiv>
+                </List.Item>}
+                />
+            </ContainerTableSearh>: ''}
+            
+        </Modal>
         <Row gutter={16} style={{ height: '100%' }} align="bottom"> 
             <Col span={24} style={{
                 height: 'calc(100% - 60px)', maxHeight: '600px', overflowY: 'scroll', position: 'sticky', 
@@ -97,7 +161,13 @@ return (
                 <TextChatDiv>
                     {texts ? texts.map((msj:any)=>{
                         return (
-                            <div style={  msj.email === props.user.email ? {textAlign: 'end'} : {textAlign: 'start'}} key={msj.id}> 
+                            msj.type === 'removed_chat' ? 
+                               <p style={{backgroundColor: 'rgba(0, 0, 0, 0.405)', borderRadius: '4px'} }key={msj.id}>
+                                    {msj.email === props.user.email? '' : <span style={{fontSize:'12px', color:'#1677ffaf'}}>&nbsp;{msj.nameUser}</span>}
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; o &#160;&nbsp; o &#160;&nbsp; o &#160;
+                                        has left the chat&nbsp; o &#160;&nbsp; o &#160;&nbsp; o &#160;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;             
+                                </p> 
+                            :<div style={  msj.email === props.user.email ? {textAlign: 'end'} : {textAlign: 'start'}} key={msj.id}> 
                                <p style={  msj.email === props.user.email ? {backgroundColor: '#1677ff'} : {backgroundColor: '#1677ff33'}}>
                                     {msj.email === props.user.email? '' : <div style={{fontSize:'12px', color:'#001529'}}>{msj.nameUser}</div>}
                                     <div>{msj.text}</div>
@@ -110,6 +180,7 @@ return (
             </Col>
             <Col span={24} style={{ padding: '3px' }}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <Button type="primary" icon={<SearchOutlined />} style={{ margin: '5px' }}  onClick={()=>setOpen(true)} />
                     <Button type="primary" icon={<FolderOpenOutlined />} style={{ margin: '5px' }} onClick={handleClick} />
                     {/* <TextArea rows={2} placeholder="Buscar..." /> */}
                     <InputEmoji

@@ -3,16 +3,17 @@ import {
   PieChartOutlined,
   TeamOutlined,
   BarsOutlined,
-  CloseOutlined,
+  DeleteOutlined,
   SettingOutlined,
   UserAddOutlined
 } from '@ant-design/icons';
-import type { MenuProps, InputRef, RadioChangeEvent } from 'antd';
-import {  Layout, Menu, Avatar, Modal, message, Button, Input, Select, Typography, Radio, theme } from 'antd';
+
 import { connectToChannel, disconnectFromChannel } from '../../utils/pusher-client';
+import type { MenuProps, InputRef, RadioChangeEvent  } from 'antd';
+import {  Layout, Menu, Avatar, Modal, message, Button, Input, Select, Typography, Radio, theme, Popconfirm } from 'antd';
 
 import { useAuth } from "../../contex";
-import { fetchData, createChat, fetchContacts } from '../../bd/chats';
+import { fetchData, createChat, fetchContacts, deleteChatDB } from '../../bd/chats';
 import { getUserData, updateUserSettings } from '../../bd/user';
 import Chat from './Chat';
 
@@ -39,12 +40,6 @@ interface Chat {
   is_group_chat: number;
   name: string;
   status: string;
-}
-
-function itemsOb(data: Chat){
-  return getItem(data && data.name ? data.name : 'undefined', `${data?.id}`, 
-    <Avatar src="https://th.bing.com/th/id/OIP.CDN83dY3lTOoX38zHLl0AgHaE8?rs=1&pid=ImgDetMain" />
-  )
 }
 
 
@@ -134,6 +129,38 @@ const Main = () => {
     };
   }, [user]);
 
+  async function deleteChat(data:any){
+    console.log('hola')
+    const res = await deleteChatDB(data.id, user?.token);
+      if(res){
+        console.log('Chats Delete');
+        loadChats();
+        loadContacts();
+        setChatSelect(null);
+      }else{
+        messageApi.open({ type: 'error', content: 'Chats not deleted' });
+      }
+  };
+  
+  function itemsOb(data: Chat){
+    return getItem(data && data.name ? 
+      <div style={{display:'relative'}}>
+        {data.name} 
+        <Popconfirm
+          title="Delete Chat"
+          description="confirm that you want to delete this chat"
+          onConfirm={()=>deleteChat(data)}
+        >
+          <DeleteOutlined style={{right: '0', marginTop: '8px', fontSize: '20px', border: '1px black', position:'absolute'}}/>
+        </Popconfirm>
+    
+  
+        
+      </div> : 'undefined', 
+      `${data?.id}`, <Avatar src="https://th.bing.com/th/id/OIP.CDN83dY3lTOoX38zHLl0AgHaE8?rs=1&pid=ImgDetMain" />
+    )
+  }
+
   function selectMenu(option: any){
       setChatSelect({
         id: option.key,
@@ -158,6 +185,7 @@ const Main = () => {
       const arrayItems = items ? [...items] : [];
       arrayItems.push(itemsOb(res.data));
       setItems(arrayItems);
+      setEmailsNewChat(['']);
     }else{
       messageApi.open({ type: 'error', content: 'Chat add error' });
     } 
@@ -219,7 +247,7 @@ const Main = () => {
       <Modal
         title={<p>Add new chat private {'('}Email{')'}</p>}
         open={open2}
-        onCancel={() => {setOpen2(false); setEmailsNewChat([''])}}
+        onCancel={() => {setOpen2(false); setEmailsNewChat(['']);}}
         footer={<Button type="primary" style={{ marginTop:'12px' }} onClick={()=> {addChat(false); setOpen2(false);}}>Send</Button>}
       >
         <Input placeholder="Email" onChange={(e)=> setEmailsNewChat([e.target.value])}/>
