@@ -9,8 +9,17 @@ export const useAuth = () => {
 };
 
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+
+    const [user, setUser] = useState(() => {
+      const cred = localStorage.getItem('credentials')
+      if(cred) {
+        setLoading(false);
+        return JSON.parse(cred)
+      } else {
+        return null
+      }
+    });
   
     const loadingData = () => {
         setLoading(true);
@@ -27,14 +36,17 @@ export function AuthProvider({ children }) {
           email: data.email,
           id: data.id
         });
+        localStorage.setItem('credentials', JSON.stringify({
+          name: data.name,
+          token: data.token,
+          email: data.email,
+          id: data.id
+        }))
     };
   
     const logout = () => {
         setUser(null);
     };
-
-    // useEffect(() => {
-    // }, []);
   
     return (
       <authContext.Provider
