@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Row, Col, Input, Button, message, Modal, Divider, List } from 'antd';
-import { SearchOutlined, FolderOpenOutlined, SendOutlined } from '@ant-design/icons';
+import { SearchOutlined, FolderOpenOutlined, SendOutlined, FileOutlined } from '@ant-design/icons';
 import InputEmoji from 'react-input-emoji';
 
 import { connectToChannel, disconnectFromChannel } from '../../../utils/pusher-client';
@@ -114,6 +114,22 @@ const Chat = ({ chatSelect, user }: any) => {
         }
 
         return matches;
+    };
+
+    const fileInsert = async (e:any) => {
+        console.log(e.target.files[0], '¡Haz hecho clic en el botón!', e);
+        const res = await sendMessage({ message: 'file', chat_id: chatSelect.id, file: e.target.files[0] }, user.token );
+        if(res){
+            console.log('send msg file ok');
+            loadMessages();
+            setText('');
+            e.target.blur();
+            e.target.files = null;
+        }else{
+            messageApi.open({ type: 'error', content: 'Msg file not send' });
+            e.target.blur();
+            e.target.files = null;
+        }
     };
 
     return (
