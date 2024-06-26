@@ -45,7 +45,7 @@ export const sendMessage = async (resData, authorization) => {
       headers: {
         'Accept': 'application/json',
         'Authorization': 'Bearer ' + authorization, // Reemplaza con el token de autorización adecuado
-        // 'Content-Type': 'application/json',
+        'Content-Type': 'application/json',
       },
       body: resData.file ? formData : JSON.stringify(data),
     });
