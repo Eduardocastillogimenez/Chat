@@ -66,8 +66,8 @@ const Chat = (props: any) => {
         loadMessages();
     }, [props.chatSelect]);
 
-    const handleClick = () => {
-        alert('¡Haz hecho clic en el botón!');
+    const fileInsert = (e:any) => {
+        console.log('¡Haz hecho clic en el botón!', e);
     };
 
     function extractContentFromString(htmlString: string) {
@@ -181,7 +181,7 @@ return (
             <Col span={24} style={{ padding: '3px' }}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <Button type="primary" icon={<SearchOutlined />} style={{ margin: '5px' }}  onClick={()=>setOpen(true)} />
-                    <Button type="primary" icon={<FolderOpenOutlined />} style={{ margin: '5px' }} onClick={handleClick} />
+                    <Input type="file" onChange={fileInsert}><Button type="primary" icon={<FolderOpenOutlined />} style={{ margin: '5px' }} /></Input>
                     {/* <TextArea rows={2} placeholder="Buscar..." /> */}
                     <InputEmoji
                         value={text}
