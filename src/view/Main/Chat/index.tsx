@@ -227,7 +227,7 @@ const Chat = ({ chatSelect, user }: any) => {
                                 <div style={msj.email === user.email ? { textAlign: 'end' } : { textAlign: 'start' }} key={msj.id}>
                                     <p style={msj.email === user.email ? { backgroundColor: '#1677ff' } : { backgroundColor: '#1677ff33' }}>
                                         {msj.email !== user.email && <div style={{ fontSize: '12px', color: '#001529' }}>{msj.nameUser}</div>}
-                                        <div style={{ color: '#20374e' }}>File: <FolderOpenOutlined style={{ fontSize: '20px'}} onClick={()=> downloadFile(msj.file, msj.fileName)} />{msj.text}</div>
+                                        <div style={{ color: '#20374e', cursor: 'pointer' }} onClick={()=> downloadFile(msj.file, msj.fileName)}>{msj.fileName} <FolderOpenOutlined style={{ fontSize: '20px'}}/></div>
                                     </p>
                                 </div>
                                 :msj.type === 'removed_chat' ? (
