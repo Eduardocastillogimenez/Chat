@@ -77,26 +77,16 @@ const Chat = ({ chatSelect, user }: any) => {
     };
 
     const loadSpecificMessages = async () => {
-        const res = await fetchChatMessages(chatSelect.id, searhMessage, user.token);
-        if (res) {
-            const arrayText = res.data.map((e: any) => ({
-                email: e.user?.email,
-                nameUser: e.user?.name,
-                text: descifrarTexto(e.message, user?.email),
-                chat_id: e.chat_id,
-                id: e.id,
-                type: e.type
-            }));
-            setTextsSearch(arrayText);
-        } else {
-            messageApi.open({ type: 'error', content: 'Msg not found' });
-        }
+        const textFilters = texts.filter((e:any) => e.text.toLowerCase().includes(searhMessage.toLowerCase()));
+        setTextsSearch(textFilters);
     };
 
     const handleOnEnter = async (text: any) => {
+        console.log('text full: ', text)
         const msjSend = extractContentFromString(text);
+        console.log('text enviado', msjSend)
         const msjSendEncrypted = cifrarTexto(msjSend, user?.email);
-
+        console.log('msjSendEncrypted enviado', msjSendEncrypted)
         const res = await sendMessage({ message: msjSendEncrypted, chat_id: chatSelect.id }, user.token);
         if (res) {
             loadMessages();
@@ -107,7 +97,8 @@ const Chat = ({ chatSelect, user }: any) => {
     };
 
     const extractContentFromString = (htmlString: string) => {
-        const regex = /<[^>]?alt=(["'])(.?)\1|>([^<]*)/g;
+        // const regex = /<[^>]?alt=(["'])(.?)\1|>([^<]*)/g;
+        const regex = /<[^>]*?alt=(["'])(.*?)\1|>([^<]*)/g;
         let matches = '';
         let match;
 
