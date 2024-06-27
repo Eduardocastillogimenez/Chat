@@ -13,6 +13,7 @@
     "@types/react-dom": "^18.3.0",
     "antd": "^5.18.3",
     "crypto-js": "^4.2.0",
+    "pusher-js": "^8.4.0-rc2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-input-emoji": "^5.9.0",

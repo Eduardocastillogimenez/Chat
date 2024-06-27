@@ -23,3 +23,8 @@ export const TextChatDiv = styled.div`
         display: inline-block;
     }
 `;
+
+export const ContainerTableSearh = styled.div`
+    max-height: 50vh;
+    overflow-y: scroll;
+`;

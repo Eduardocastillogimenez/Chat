@@ -1,5 +1,5 @@
 export const getUserData = async (authorization) => {
-    const url = 'http://instant-messaging-laravel-chat.test/api/user'; // Reemplaza '{{url}}' con la URL correcta
+    const url = process.env.REACT_APP_API_URL + '/user'; // Reemplaza '{{url}}' con la URL correcta
     try {
       const response = await fetch(url, {
         method: 'GET',
@@ -25,7 +25,7 @@ export const getUserData = async (authorization) => {
 
 
 export const updateUserSettings = async (resData,authorization) => {
-    const url = 'http://instant-messaging-laravel-chat.test/api/user'; // Reemplaza '{{url}}' con la URL correcta
+    const url = process.env.REACT_APP_API_URL + '/user'; // Reemplaza '{{url}}' con la URL correcta
     const data = new FormData();
     data.append('name', resData.name);
     data.append('theme', resData.theme);

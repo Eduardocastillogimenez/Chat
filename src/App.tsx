@@ -13,7 +13,7 @@ const App = () => {
     }
   }, [user]);
 
-  return (<> {loading ? '' : user? <Main/> : 'loading user'} </>);
+  return (<> { user? <Main/> : 'loading user'} </>);
 };
 
 export default App;

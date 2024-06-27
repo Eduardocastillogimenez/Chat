@@ -1,5 +1,5 @@
-export const fetchChatMessages = async (idMessages, authorization) => {
-    const url = 'http://instant-messaging-laravel-chat.test/api/chat/messages?chat_id=' + idMessages; // Reemplaza '{{url}}' con la URL correcta
+export const fetchChatMessages = async (idMessages, search, authorization) => {
+    const url = process.env.REACT_APP_API_URL + '/chat/messages?chat_id=' + idMessages + (search ? `&search=${search}` : ''); // Reemplaza '{{url}}' con la URL correcta
     try {
       const response = await fetch(url, {
         method: 'GET',
@@ -27,27 +27,52 @@ export const fetchChatMessages = async (idMessages, authorization) => {
 
 
 export const sendMessage = async (resData, authorization) => {
-  const url = 'http://instant-messaging-laravel-chat.test/api/chat/message'; // Reemplaza '{{url}}' con la URL correcta
-  const data = {
-    message: resData.message,
-    chat_id: resData.chat_id,
+  const url = process.env.REACT_APP_API_URL + '/chat/message'; // Reemplaza '{{url}}' con la URL correcta
+
+
+  // const formData = new FormData();
+  // formData.append("chat_id", resData.chat_id);
+  // if(resData.message) {
+  //   formData.append("message", resData.message);
+  // }
+  // if(resData.file) {
+  //   formData.append("file", resData.file);
+  // }
+
+  const myHeaders = new Headers();
+  myHeaders.append("Accept", "application/json");
+  myHeaders.append("Authorization", "Bearer " + authorization);
+
+  const formdata = new FormData();
+  
+  formdata.append("chat_id", resData.chat_id);
+  if(resData.file) {
+      formdata.append("file", resData.file, "[PROXY]");
+      formdata.append("message", "{\"ct\":\"lrTWFcUtTzylEY6+2lLyZg==\",\"iv\":\"00ac71c09e0748d766589103ff43d254\",\"s\":\"08a9ae1967f57b81\"}");
+  }else{
+    formdata.append("message", resData.message);
+  }
+  
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow"
   };
 
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Bearer ' + authorization, // Reemplaza con el token de autorización adecuado
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+    let response = undefined;
+    await fetch(url, requestOptions)
+      .then((response) => response.text())
+      .then((result) => response = JSON.parse(result))
+      .catch((error) => response = error);
 
-    if (response.ok) {
-      const responseData = await response.json();
-      console.log('Mensaje enviado:', responseData);
-      return responseData;
+    // console.log('response.data',response.data)
+    if (response.data) {
+      // const responseData = await response.json();
+      console.log('Mensaje enviado:', response);
+      return response.data;
     } else {
       console.error('Error al enviar el mensaje:', response.statusText);
       return null;

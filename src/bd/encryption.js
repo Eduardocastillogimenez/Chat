@@ -1,5 +1,5 @@
 const getPublicKey = async (authorization) => {
-    const url = 'http://instant-messaging-laravel-chat.test/api/encryption/server/public-key'; // Reemplaza '{{url}}' con la URL correcta
+    const url = process.env.REACT_APP_API_URL + '/encryption/server/public-key'; // Reemplaza '{{url}}' con la URL correcta
     try {
       const response = await fetch(url, {
         method: 'GET',
@@ -23,7 +23,7 @@ const getPublicKey = async (authorization) => {
   
 
 const updatePublicKey = async (public_key, authorization) => {
-    const url = 'http://instant-messaging-laravel-chat.test/api/encryption/user/public-key'; // Reemplaza '{{url}}' con la URL correcta
+    const url = process.env.REACT_APP_API_URL + '/encryption/user/public-key'; // Reemplaza '{{url}}' con la URL correcta
     const data = {
       public_key: public_key
     };

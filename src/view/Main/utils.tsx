@@ -19,14 +19,17 @@ const CryptoJSAesJson = {
 }
 
 export const cifrarTexto = (texto: string, email: string) => {
+    if(!texto) {
+        return null;
+    }
   var textoCifrado = CryptoJS.AES.encrypt(texto, `messaging-${email}-key`).toString();
   var encrypted = CryptoJS.AES.encrypt(JSON.stringify(texto), `messaging-${email}-key`, {format: CryptoJSAesJson}).toString();
   return encrypted;
 }
 export  const descifrarTexto = (texto: string, email: string ) => {
-  // var bytes = CryptoJS.AES.decrypt(texto, `messaging-${email}-key`);
-  // var textoDescifrado = bytes.toString(CryptoJS.enc.Utf8); 
-  // var decrypted = JSON.parse(CryptoJS.AES.decrypt(texto, `messaging-${email}-key`, {format: CryptoJSAesJson}).toString(CryptoJS.enc.Utf8));
+    if(!texto) {
+        return null;
+    }
   var decrypted = JSON.parse(CryptoJS.AES.decrypt(texto, `messaging-${email}-key`, {format: CryptoJSAesJson}).toString(CryptoJS.enc.Utf8));
   return decrypted;
 }
