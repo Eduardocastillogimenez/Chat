@@ -42,7 +42,8 @@ const Chat = ({ chatSelect, user }: any) => {
                     text: descifrarTexto(message.message, user?.email),
                     chat_id: message.chat_id,
                     id: message.id,
-                    type: message.type
+                    type: message.type,
+                    file: message.file_url
                 }
             ]);
         });
@@ -57,7 +58,8 @@ const Chat = ({ chatSelect, user }: any) => {
                 text: descifrarTexto(e.message, user?.email),
                 chat_id: e.chat_id,
                 id: e.id,
-                type: e.type
+                type: e.type,
+                file: e.file_url
             }));
             setTexts(arrayText);
         } else {
@@ -184,7 +186,14 @@ const Chat = ({ chatSelect, user }: any) => {
                 }}>
                     <TextChatDiv>
                         {texts ? texts.map((msj: any) => (
-                            msj.type === 'removed_chat' ? (
+                            msj.file ? 
+                                <div style={msj.email === user.email ? { textAlign: 'end' } : { textAlign: 'start' }} key={msj.id}>
+                                    <p style={msj.email === user.email ? { backgroundColor: '#1677ff' } : { backgroundColor: '#1677ff33' }}>
+                                        {msj.email !== user.email && <div style={{ fontSize: '12px', color: '#001529' }}>{msj.nameUser}</div>}
+                                        <div style={{ color: '#20374e' }}>File: <FolderOpenOutlined style={{ fontSize: '20px'}} onClick={()=> alert(msj.file)} />{msj.text}</div>
+                                    </p>
+                                </div>
+                           :msj.type === 'removed_chat' ? (
                                 <p style={{ backgroundColor: 'rgba(0, 0, 0, 0.405)', borderRadius: '4px' }} key={msj.id}>
                                     {msj.email !== user.email && <span style={{ fontSize: '12px', color: '#1677ffaf' }}>&nbsp;{msj.nameUser}</span>}
                                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; o &#160;&nbsp; o &#160;&nbsp; o &#160;

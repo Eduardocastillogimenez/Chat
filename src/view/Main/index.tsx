@@ -57,10 +57,10 @@ const Main = () => {
   const [contacts, setContacts] = useState<any>(null);
   const [userEmailAdd, setUserEmailAdd] = useState('');
   const [nameGroup, setNameGroup] = useState('');
-  const [valueUserConfig, setValueUserConfig] = useState({ theme: 'light' });
+  const [valueUserConfig, setValueUserConfig] = useState({ theme: 'dark' });
   const [messageApi, contextHolder] = message.useMessage();
   const [emailsNewChat, setEmailsNewChat] = useState(['']);
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [channelName, setChannelName] = useState('');
   const [pusherConnection, setPusherConnection] = useState<any>(null);
 
@@ -206,6 +206,9 @@ const Main = () => {
           <TeamOutlined style={{ margin: '12px', fontSize: '40px', color: '#1677ffaf' }} onClick={() => setOpen3(true)} />
           <UserAddOutlined style={{ margin: '12px', fontSize: '40px', color: '#1677ffaf' }} onClick={() => setOpen2(true)} />
           <SettingOutlined style={{ margin: '12px', fontSize: '40px', color: '#1677ffaf' }} onClick={() => setOpen4(true)} />
+          <span style={{  display: 'inline-flex', paddingBottom: '5px', textAlign:'start'}}>
+            <Button type="link" block onClick={()=> logout()} style={{  color:'#1677ffaf'}} > Log out </Button>
+          </span>
         </Modal>
         <Modal
             title={<p>Add new chat private {'('}Email{')'}</p>}
@@ -255,7 +258,10 @@ const Main = () => {
 
         <Layout style={{ minHeight: '100vh', overflowY: 'hidden' }}>
           <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)} width='400'>
-            <div style={{ textAlign: 'end', background: theme().background }}>
+            <div  style={{ textAlign: 'end', background: theme().background }}>
+              <span style={{  display: 'inline-flex', paddingBottom: '5px', textAlign:'start'}}>
+                <Button type="link" block onClick={()=> logout()} style={{  color:'white'}} > Log out </Button>
+              </span>
               {!collapsed && <TeamOutlined style={{ margin: '12px', fontSize: '40px', color: theme().color }} onClick={() => setOpen3(true)} />}
               {!collapsed && <UserAddOutlined style={{ margin: '12px', fontSize: '40px', color: theme().color }} onClick={() => setOpen2(true)} />}
               {!collapsed && <SettingOutlined style={{ margin: '12px', fontSize: '40px', color: theme().color }} onClick={() => setOpen4(true)} />}
