@@ -83,9 +83,10 @@ const Main = () => {
     const channel = connectToChannel(_channelName);
     setPusherConnection(channel);
     channel.bind('new-chat', (data: any) => {
-      const chat = data.chat;
-      setChats((prevChats: any) => [...(prevChats || []), chat]);
-      setItems((prevItems: any) => [...(prevItems || []), itemsOb(chat)]);
+      loadChats()
+    });
+    channel.bind('deleted-chat', (data: any) => {
+      loadChats()
     });
   };
 
