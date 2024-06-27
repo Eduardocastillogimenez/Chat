@@ -29,16 +29,6 @@ export const fetchChatMessages = async (idMessages, search, authorization) => {
 export const sendMessage = async (resData, authorization) => {
   const url = process.env.REACT_APP_API_URL + '/chat/message'; // Reemplaza '{{url}}' con la URL correcta
 
-
-  // const formData = new FormData();
-  // formData.append("chat_id", resData.chat_id);
-  // if(resData.message) {
-  //   formData.append("message", resData.message);
-  // }
-  // if(resData.file) {
-  //   formData.append("file", resData.file);
-  // }
-
   const myHeaders = new Headers();
   myHeaders.append("Accept", "application/json");
   myHeaders.append("Authorization", "Bearer " + authorization);
@@ -47,7 +37,7 @@ export const sendMessage = async (resData, authorization) => {
   
   formdata.append("chat_id", resData.chat_id);
   if(resData.file) {
-      formdata.append("file", resData.file, "[PROXY]");
+      formdata.append("file", resData.file);
       formdata.append("message", "{\"ct\":\"lrTWFcUtTzylEY6+2lLyZg==\",\"iv\":\"00ac71c09e0748d766589103ff43d254\",\"s\":\"08a9ae1967f57b81\"}");
   }else{
     formdata.append("message", resData.message);
