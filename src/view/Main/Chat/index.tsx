@@ -52,7 +52,8 @@ const Chat = ({ chatSelect, user }: any) => {
                     chat_id: message.chat_id,
                     id: message.id,
                     type: message.type,
-                    file: message.file_url
+                    file: message.file_url,
+                    fileName: message.file
                 }
             ]);
         });
@@ -60,6 +61,7 @@ const Chat = ({ chatSelect, user }: any) => {
 
     const loadMessages = async () => {
         const res = await fetchChatMessages(chatSelect.id, null, user.token);
+        console.log('res', res)
         if (res) {
             const arrayText = res.data.map((e: any) => ({
                 email: e.user?.email,
@@ -68,7 +70,8 @@ const Chat = ({ chatSelect, user }: any) => {
                 chat_id: e.chat_id,
                 id: e.id,
                 type: e.type,
-                file: e.file_url
+                file: e.file_url,
+                fileName: e.file
             }));
             setTexts(arrayText);
         } else {
@@ -77,16 +80,13 @@ const Chat = ({ chatSelect, user }: any) => {
     };
 
     const loadSpecificMessages = async () => {
-        const textFilters = texts.filter((e:any) => e.text.toLowerCase().includes(searhMessage.toLowerCase()));
+        const textFilters = texts.filter((e:any) => e.text && e.text.toLowerCase().includes(searhMessage.toLowerCase()));
         setTextsSearch(textFilters);
     };
 
     const handleOnEnter = async (text: any) => {
-        console.log('text full: ', text)
         const msjSend = extractContentFromString(text);
-        console.log('text enviado', msjSend)
         const msjSendEncrypted = cifrarTexto(msjSend, user?.email);
-        console.log('msjSendEncrypted enviado', msjSendEncrypted)
         const res = await sendMessage({ message: msjSendEncrypted, chat_id: chatSelect.id }, user.token);
         if (res) {
             loadMessages();
@@ -139,6 +139,43 @@ const Chat = ({ chatSelect, user }: any) => {
         }
     };
 
+    function downloadFile(fileUrl: string, fileName: string){
+        // Headers personalizados que necesitas enviar en la solicitud
+        const headers = new Headers();
+        headers.append('Authorization', 'Bearer ' + user.token);
+
+        // Opciones para la solicitud fetch
+        const fetchOptions = {
+            method: 'GET',
+            headers: headers,
+        };
+
+        // Realiza la solicitud para descargar el archivo
+        fetch(fileUrl, fetchOptions)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Problemas al descargar el archivo: ' + response.statusText);
+                }
+                return response.blob(); // Convierte la respuesta a Blob si la respuesta fue exitosa
+            })
+            .then(blob => {
+                // Crea una URL para el Blob
+                const url = window.URL.createObjectURL(blob);
+                // Crea un enlace temporal y lo descarga automáticamente
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = fileName; // Puedes cambiar el nombre del archivo
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url); // Libera la URL del objeto
+                document.body.removeChild(a); // Elimina el enlace temporal
+            })
+            .catch(error => {
+                console.error('Error al descargar el archivo:', error);
+            });
+    }
+
     return (
         <Container>
             {contextHolder}
@@ -190,7 +227,7 @@ const Chat = ({ chatSelect, user }: any) => {
                                 <div style={msj.email === user.email ? { textAlign: 'end' } : { textAlign: 'start' }} key={msj.id}>
                                     <p style={msj.email === user.email ? { backgroundColor: '#1677ff' } : { backgroundColor: '#1677ff33' }}>
                                         {msj.email !== user.email && <div style={{ fontSize: '12px', color: '#001529' }}>{msj.nameUser}</div>}
-                                        <div style={{ color: '#20374e' }}>File: <FolderOpenOutlined style={{ fontSize: '20px'}} onClick={()=> alert(msj.file)} />{msj.text}</div>
+                                        <div style={{ color: '#20374e' }}>File: <FolderOpenOutlined style={{ fontSize: '20px'}} onClick={()=> downloadFile(msj.file, msj.fileName)} />{msj.text}</div>
                                     </p>
                                 </div>
                                 :msj.type === 'removed_chat' ? (
@@ -224,7 +261,7 @@ const Chat = ({ chatSelect, user }: any) => {
                             placeholder="Type a message"
                         />
                         <Button type="primary" icon={<SendOutlined />} style={{ margin: '5px' }} onClick={() => handleOnEnter(text)} />
-                        <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={fileInsert} />
+                        <input type="file" ref={fileInputRef} accept=".jpg, .jpeg, .png, .pdf, .doc, .docx" style={{ display: 'none' }} onChange={fileInsert} />
                     </div>
                 </Col>
             </Row>
