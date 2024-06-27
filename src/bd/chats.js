@@ -87,3 +87,31 @@ export const createChat = async (resData, authorization) => {
 };
 
   
+
+export const deleteChatDB = async (id, authorization) => {
+  const url = 'http://instant-messaging-laravel-chat.test/api/chat/' + id;
+
+
+  try {
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + authorization, // Reemplaza con el token de autorización adecuado
+      },
+    });
+
+    if (response.ok) {
+      const responseData = await response.json();
+      console.log('La petición DELETE se realizó correctamente', responseData);
+      return 'ok';
+    } else {
+      console.error('Error al realizar la petición DELETE', response.statusText);
+      return null;
+    }
+  } catch (error) {
+    console.error('Error en la petición DELETE', error.message);
+    return null;
+  }
+};
