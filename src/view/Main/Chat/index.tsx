@@ -42,21 +42,19 @@ const Chat = ({ chatSelect, user }: any) => {
         setPusherConnection(channel);
 
         channel.bind(`new-message.${user.id}`, (data: any) => {
-            // const message = data.message;
-            // console.log("LLEGO EL MENSAJE EN EL BIND de pusher:  ", data);
-            // setTexts((prevTexts: any) => [
-            //     ...prevTexts,
-            //     {
-            //         email: message.user?.email,
-            //         nameUser: message.user?.name,
-            //         text: descifrarTexto(message.message, user?.email),
-            //         chat_id: message.chat_id,
-            //         id: message.id,
-            //         type: message.type,
-            //         file: message.file_url
-            //     }
-            // ]);
-            loadMessages()
+            const message = data.message;
+            setTexts((prevTexts: any) => [
+                ...prevTexts,
+                {
+                    email: message.user?.email,
+                    nameUser: message.user?.name,
+                    text: descifrarTexto(message.message, user?.email),
+                    chat_id: message.chat_id,
+                    id: message.id,
+                    type: message.type,
+                    file: message.file_url
+                }
+            ]);
         });
     };
 
