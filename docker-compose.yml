@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  react-app:
+    build:
+      context: .
+    env_file:
+      - .env
+    ports:
+      - "4000:80"
+    volumes:
+      - .:/var/www/html
