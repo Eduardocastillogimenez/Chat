@@ -1,5 +1,5 @@
 export const fetchChatMessages = async (idMessages, search, authorization) => {
-    const url = 'http://instant-messaging-laravel-chat.test/api/chat/messages?chat_id=' + idMessages + (search ? `&search=${search}` : ''); // Reemplaza '{{url}}' con la URL correcta
+    const url = process.env.REACT_APP_API_URL + '/chat/messages?chat_id=' + idMessages + (search ? `&search=${search}` : ''); // Reemplaza '{{url}}' con la URL correcta
     try {
       const response = await fetch(url, {
         method: 'GET',
@@ -27,7 +27,7 @@ export const fetchChatMessages = async (idMessages, search, authorization) => {
 
 
 export const sendMessage = async (resData, authorization) => {
-  const url = 'http://instant-messaging-laravel-chat.test/api/chat/message'; // Reemplaza '{{url}}' con la URL correcta
+  const url = process.env.REACT_APP_API_URL + '/chat/message'; // Reemplaza '{{url}}' con la URL correcta
 
 
   // const formData = new FormData();

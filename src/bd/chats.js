@@ -1,5 +1,5 @@
 export const fetchData = async (authorization) => {
-    const url = 'http://instant-messaging-laravel-chat.test/api/chat'; // Reemplaza '{{url}}' con la URL correcta
+    const url = process.env.REACT_APP_API_URL + '/chat'; // Reemplaza '{{url}}' con la URL correcta
     try {
       const response = await fetch(url, {
         method: 'GET',
@@ -28,7 +28,7 @@ export const fetchData = async (authorization) => {
 
 
 export const fetchContacts = async (authorization) => {
-    const url = 'http://instant-messaging-laravel-chat.test/api/chat/contacts'; // Reemplaza '{{url}}' con la URL correcta
+    const url = process.env.REACT_APP_API_URL + '/chat/contacts'; // Reemplaza '{{url}}' con la URL correcta
     try {
       const response = await fetch(url, {
         method: 'GET',
@@ -54,7 +54,7 @@ export const fetchContacts = async (authorization) => {
 
 
 export const createChat = async (resData, authorization) => {
-    const url = 'http://instant-messaging-laravel-chat.test/api/chat'; // Reemplaza '{{url}}' con la URL correcta
+    const url = process.env.REACT_APP_API_URL + '/chat'; // Reemplaza '{{url}}' con la URL correcta
     const data = {
       name: resData.name,
       is_group_chat: resData.group,
@@ -89,7 +89,7 @@ export const createChat = async (resData, authorization) => {
   
 
 export const deleteChatDB = async (id, authorization) => {
-  const url = 'http://instant-messaging-laravel-chat.test/api/chat/' + id;
+  const url = process.env.REACT_APP_API_URL + '/chat/' + id;
 
 
   try {

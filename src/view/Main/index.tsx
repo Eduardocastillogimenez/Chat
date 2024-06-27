@@ -83,10 +83,11 @@ const Main = () => {
     const channel = connectToChannel(_channelName);
     setPusherConnection(channel);
     channel.bind('new-chat', (data: any) => {
-      const chat = data.chat;
-      alert('Se ha creado un nuevo chat: ' + chat.name);
-      setChats((prevChats: any) => [...(prevChats || []), chat]);
-      setItems((prevItems: any) => [...(prevItems || []), itemsOb(chat)]);
+      // const chat = data.chat;
+      // alert('Se ha creado un nuevo chat: ' + chat.name);
+      // setChats((prevChats: any) => [...(prevChats || []), chat]);
+      // setItems((prevItems: any) => [...(prevItems || []), itemsOb(chat)]);
+      loadChats()
     });
   };
 

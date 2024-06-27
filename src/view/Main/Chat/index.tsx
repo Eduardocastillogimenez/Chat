@@ -15,37 +15,48 @@ const Chat = ({ chatSelect, user }: any) => {
     const [open, setOpen] = useState<boolean>(false);
     const [searhMessage, setSearhMessage] = useState("");
     const [messageApi, contextHolder] = message.useMessage();
-    const [channelName, setChannelName] = useState('');
-    const [pusherConnection, setPusherConnection] = useState<any>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const [channelName, setChannelName] = useState<any>('');
+    const [pusherConnection, setPusherConnection] = useState<any>(null);
 
     useEffect(() => {
         loadMessages();
-        handleConnectNewMessage();
+
+        if(chatSelect?.id > 0 && pusherConnection === null){
+            handleConnectNewMessage();
+        }
+
         return () => {
-            disconnectFromChannel(pusherConnection, channelName);
+            const disconnected = disconnectFromChannel(pusherConnection, channelName);
+            console.log(disconnected)
+            setPusherConnection(null);
         };
-    }, [chatSelect]);
+    }, []);
 
     const handleConnectNewMessage = async () => {
         const _channelName = `chat.${chatSelect.id}`;
-        setChannelName(_channelName);
         const channel = connectToChannel(_channelName);
+
+        setChannelName(_channelName);
         setPusherConnection(channel);
+
         channel.bind(`new-message.${user.id}`, (data: any) => {
-            const message = data.message;
-            setTexts((prevTexts: any) => [
-                ...prevTexts,
-                {
-                    email: message.user?.email,
-                    nameUser: message.user?.name,
-                    text: descifrarTexto(message.message, user?.email),
-                    chat_id: message.chat_id,
-                    id: message.id,
-                    type: message.type,
-                    file: message.file_url
-                }
-            ]);
+            // const message = data.message;
+            // console.log("LLEGO EL MENSAJE EN EL BIND de pusher:  ", data);
+            // setTexts((prevTexts: any) => [
+            //     ...prevTexts,
+            //     {
+            //         email: message.user?.email,
+            //         nameUser: message.user?.name,
+            //         text: descifrarTexto(message.message, user?.email),
+            //         chat_id: message.chat_id,
+            //         id: message.id,
+            //         type: message.type,
+            //         file: message.file_url
+            //     }
+            // ]);
+            loadMessages()
         });
     };
 
@@ -87,7 +98,7 @@ const Chat = ({ chatSelect, user }: any) => {
     const handleOnEnter = async (text: any) => {
         const msjSend = extractContentFromString(text);
         const msjSendEncrypted = cifrarTexto(msjSend, user?.email);
-        console.log(fileInputRef)
+
         const res = await sendMessage({ message: msjSendEncrypted, chat_id: chatSelect.id }, user.token);
         if (res) {
             loadMessages();
@@ -98,7 +109,7 @@ const Chat = ({ chatSelect, user }: any) => {
     };
 
     const extractContentFromString = (htmlString: string) => {
-        const regex = /<[^>]*?alt=(["'])(.*?)\1|>([^<]*)/g;
+        const regex = /<[^>]?alt=(["'])(.?)\1|>([^<]*)/g;
         let matches = '';
         let match;
 
@@ -186,27 +197,27 @@ const Chat = ({ chatSelect, user }: any) => {
                 }}>
                     <TextChatDiv>
                         {texts ? texts.map((msj: any) => (
-                            msj.file ? 
+                            msj.file ?
                                 <div style={msj.email === user.email ? { textAlign: 'end' } : { textAlign: 'start' }} key={msj.id}>
                                     <p style={msj.email === user.email ? { backgroundColor: '#1677ff' } : { backgroundColor: '#1677ff33' }}>
                                         {msj.email !== user.email && <div style={{ fontSize: '12px', color: '#001529' }}>{msj.nameUser}</div>}
                                         <div style={{ color: '#20374e' }}>File: <FolderOpenOutlined style={{ fontSize: '20px'}} onClick={()=> alert(msj.file)} />{msj.text}</div>
                                     </p>
                                 </div>
-                           :msj.type === 'removed_chat' ? (
-                                <p style={{ backgroundColor: 'rgba(0, 0, 0, 0.405)', borderRadius: '4px' }} key={msj.id}>
-                                    {msj.email !== user.email && <span style={{ fontSize: '12px', color: '#1677ffaf' }}>&nbsp;{msj.nameUser}</span>}
-                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; o &#160;&nbsp; o &#160;&nbsp; o &#160;
-                                    has left the chat&nbsp; o &#160;&nbsp; o &#160;&nbsp; o &#160;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                </p>
-                            ) : (
-                                <div style={msj.email === user.email ? { textAlign: 'end' } : { textAlign: 'start' }} key={msj.id}>
-                                    <p style={msj.email === user.email ? { backgroundColor: '#1677ff' } : { backgroundColor: '#1677ff33' }}>
-                                        {msj.email !== user.email && <div style={{ fontSize: '12px', color: '#001529' }}>{msj.nameUser}</div>}
-                                        <div>{msj.text}</div>
+                                :msj.type === 'removed_chat' ? (
+                                    <p style={{ backgroundColor: 'rgba(0, 0, 0, 0.405)', borderRadius: '4px' }} key={msj.id}>
+                                        {msj.email !== user.email && <span style={{ fontSize: '12px', color: '#1677ffaf' }}>&nbsp;{msj.nameUser}</span>}
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; o &#160;&nbsp; o &#160;&nbsp; o &#160;
+                                        has left the chat&nbsp; o &#160;&nbsp; o &#160;&nbsp; o &#160;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                     </p>
-                                </div>
-                            )
+                                ) : (
+                                    <div style={msj.email === user.email ? { textAlign: 'end' } : { textAlign: 'start' }} key={msj.id}>
+                                        <p style={msj.email === user.email ? { backgroundColor: '#1677ff' } : { backgroundColor: '#1677ff33' }}>
+                                            {msj.email !== user.email && <div style={{ fontSize: '12px', color: '#001529' }}>{msj.nameUser}</div>}
+                                            <div>{msj.text}</div>
+                                        </p>
+                                    </div>
+                                )
                         )) : ''}
                     </TextChatDiv>
                 </Col>

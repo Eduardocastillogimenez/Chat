@@ -1,5 +1,5 @@
 const registerUser = async (resData) => {
-    const url = 'http://instant-messaging-laravel-chat.test/api/auth/register'; // Reemplaza '{{url}}' con la URL correcta
+    const url = process.env.REACT_APP_API_URL + '/auth/register'; // Reemplaza '{{url}}' con la URL correcta
     const data = {
       name: resData.name,
       email: resData.email,

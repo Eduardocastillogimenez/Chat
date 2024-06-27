@@ -13,4 +13,5 @@ export function disconnectFromChannel (connection, channelName) {
   if(connection) {
     return connection.unsubscribe(channelName);
   }
+  return null
 }
